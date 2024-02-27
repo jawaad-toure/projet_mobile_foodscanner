@@ -1,8 +1,11 @@
 package com.univ_amu.food_scanner.ui;
 
 import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.navigation.NavDirections;
+import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
@@ -44,6 +47,11 @@ public class FoodListAdapter extends ListAdapter<Food, FoodListAdapter.ViewHolde
         void bind(Food food) {
             this.food = food;
             foodItemBinding.invalidateAll();
+        }
+
+        public void onClick(View view) {
+            NavDirections action = FoodListFragmentDirections.actionFoodListFragmentToFoodFragment();
+            Navigation.findNavController(foodItemBinding.getRoot()).navigate(action);
         }
 
     }
