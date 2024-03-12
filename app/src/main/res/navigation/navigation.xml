@@ -11,6 +11,7 @@
             android:id="@+id/action_FoodListFragment_to_FoodFragment"
             app:destination="@id/FoodFragment" />
     </fragment>
+
     <fragment
         android:id="@+id/FoodFragment"
         android:name="com.univ_amu.food_scanner.ui.FoodFragment"
@@ -19,4 +20,6 @@
             android:name="code"
             app:argType="string" />
     </fragment>
+
+
 </navigation>

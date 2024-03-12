@@ -50,23 +50,23 @@ public class FoodListAdapter extends ListAdapter<Food, FoodListAdapter.ViewHolde
         }
 
         public void onClick(View view) {
-            NavDirections action = FoodListFragmentDirections.actionFoodListFragmentToFoodFragment();
+            NavDirections action = FoodListFragmentDirections.actionFoodListFragmentToFoodFragment(food.code);
             Navigation.findNavController(foodItemBinding.getRoot()).navigate(action);
         }
 
     }
 
-    private static final DiffUtil.ItemCallback<Food> diffUtilCallback =
-            new DiffUtil.ItemCallback<Food>() {
+    private static final DiffUtil.ItemCallback<Food> diffUtilCallback = new DiffUtil.ItemCallback<Food>() {
 
-                @Override
-                public boolean areItemsTheSame(Food oldFood, Food newFood) {
-                    return oldFood.code.equals(newFood.code);
-                }
-                @Override
-                public boolean areContentsTheSame(Food oldFood, Food newFood) {
-                    return this.areItemsTheSame(oldFood, newFood);
-                }
-            };
+        @Override
+        public boolean areItemsTheSame(Food oldFood, Food newFood) {
+            return oldFood.code.equals(newFood.code);
+        }
+
+        @Override
+        public boolean areContentsTheSame(Food oldFood, Food newFood) {
+            return this.areItemsTheSame(oldFood, newFood);
+        }
+    };
 
 }

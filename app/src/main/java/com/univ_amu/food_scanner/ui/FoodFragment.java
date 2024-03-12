@@ -14,13 +14,20 @@ import com.univ_amu.food_scanner.viewmodels.FoodViewModelFactory;
 
 public class FoodFragment extends Fragment {
 
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public FoodViewModel model;
 
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         FragmentFoodBinding binding = FragmentFoodBinding.inflate(inflater, container, false);
         String code = FoodFragmentArgs.fromBundle(getArguments()).getCode();
-        FoodViewModel model = ViewModelProviders.of(this,
-                new FoodViewModelFactory(getActivity().getApplication(), code)).get(FoodViewModel.class);
+
+        FoodViewModel model = ViewModelProviders.of(this, new FoodViewModelFactory(getActivity().getApplication(), code)).get(FoodViewModel.class);
         binding.setModel(model);
+
+        QuantityListAdapter adapter = new QuantityListAdapter();
+        model.quantities().observe(this, adapter::submitList);
+        binding.quantityList.setAdapter(adapter);
+        binding.setLifecycleOwner(this);
+
         return binding.getRoot();
     }
 }

@@ -1,5 +1,15 @@
 package com.univ_amu.food_scanner.data;
 
+import android.content.Context;
+import android.util.Log;
+
+import androidx.lifecycle.LiveData;
+
+import com.univ_amu.food_scanner.data.database.Dao;
+import com.univ_amu.food_scanner.data.database.Database;
+import com.univ_amu.food_scanner.data.network.Network;
+import com.univ_amu.food_scanner.data.network.NetworkFood;
+
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
@@ -8,47 +18,63 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
 public class Repository {
-    public Repository() {
-        addRandomFoodsIfEmpty();
+    private final Context context;
+    private final ExecutorService executor;
+    private Dao dao;
+
+    public Repository(Context context) {
+        this.context = context;
+        this.dao = null;
+        executor = Executors.newSingleThreadExecutor();
+        this.addRandomFoodsIfEmpty();
     }
 
-    public int getFoodCount() {
-        return foods.size();
+    private Dao dao() {
+        if (dao == null) {
+            Database database = Database.getInstance(context);
+            this.dao = database.dao();
+        }
+        return this.dao;
     }
 
-    public List<Food> getFoods() {
-        return foods;
+    public LiveData<Integer> getFoodCount() {
+        return dao().getFoodCount();
     }
 
-    public Food getFood(String foodCode) {
-        return foods.stream()
-                .filter(food-> food.code.equals(foodCode))
-                .findFirst()
-                .get();
+    public LiveData<List<Food>> getFoods() {
+        return dao().getFoods();
     }
 
-    public List<Quantity> getQuantities(String foodCode) {
-        return quantities.stream()
-                .filter(quantity-> quantity.foodCode.equals(foodCode))
-                .sorted(Comparator.comparingInt(quantity->quantity.rank))
-                .collect(Collectors.toList());
+    public LiveData<Food> getFood(String foodCode) {
+        return dao().getFood(foodCode);
+    }
+
+    public LiveData<List<Quantity>> getQuantities(String foodCode) {
+        return dao().getQuantities(foodCode);
     }
 
     public void insertFood(Food food, List<Quantity> quantities) {
-        foods.add(0, food);
-        this.quantities.addAll(quantities);
+        executor.execute(()->dao().insertFood(food, quantities));
     }
 
     public void addRandomFoodsIfEmpty() {
-        if (getFoodCount()!=0) return;
-        for (Date date : dates) {
-            for (int i = 0; i < 2; i++) {
-                addRandomFood(date);
+        getFoodCount().observeForever(value->{
+            if (value != 0) return;
+            for (Date date : dates) {
+                for (int i = 0; i < 2; i++) {
+                    addRandomFood(date);
+                }
             }
-        }
+        });
     }
 
     public void addRandomFood(Date date) {
@@ -87,4 +113,21 @@ public class Repository {
     private static String[] names = { "Jus de Fruits", "Biscuits", "Haricots verts" };
     private static String[] brands = { "TropTopFoods", "SuperFoods", "Foods++" };
     private static String[] nutriscores = { "A", "B", "C", "D", "E" };
+
+    public void downloadFood(String code) {
+        Network.getService(context).getFood(code).enqueue(new Callback<NetworkFood>() {
+            @Override
+            public void onResponse(Call<NetworkFood> call, Response<NetworkFood> response) {
+                if (!response.isSuccessful()) { Log.i("FOOD_SCANNER", "ERROR (onResponse) !!!"); }
+                else {
+                    Log.i("FOOD_SCANNER", "DOWNLOAD : "+response.body());
+                }
+            }
+
+            @Override
+            public void onFailure(Call<NetworkFood> call, Throwable t) {
+                Log.i("FOOD_SCANNER", "ERROR (onFailure) !!!");
+            }
+        });
+    }
 }

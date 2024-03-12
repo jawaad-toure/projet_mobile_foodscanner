@@ -8,6 +8,7 @@
             name="food"
             type="com.univ_amu.food_scanner.data.Food" />
     </data>
+
     <merge>
         <com.univ_amu.food_scanner.ui.NutriscoreView
             android:id="@+id/nutriscore"
@@ -17,13 +18,11 @@
             app:layout_constraintStart_toStartOf="parent"
             app:nutriscore="@{food.nutriscore}" />
 
-        <!--- TODO : à compléter en copiant et en modifiant une partie
-                     du layout food_item.xml -->
         <TextView
             android:id="@+id/name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="16dp"
+            android:layout_marginStart="16dp"
             app:layout_constraintStart_toEndOf="@id/nutriscore"
             app:layout_constraintTop_toTopOf="parent"
             android:text="@{food.name}"
@@ -37,7 +36,7 @@
             android:id="@+id/brands"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="16dp"
+            android:layout_marginStart="16dp"
             app:layout_constraintStart_toEndOf="@id/nutriscore"
             app:layout_constraintTop_toBottomOf="@id/name"
             android:text="@{food.brands}"
@@ -50,7 +49,7 @@
             android:id="@+id/date_icon"
             app:layout_constraintTop_toBottomOf="@id/brands"
             app:layout_constraintStart_toEndOf="@id/nutriscore"
-            android:layout_marginLeft="16dp"
+            android:layout_marginStart="16dp"
             android:layout_marginTop="1dp"
             android:layout_width="14dp"
             android:layout_height="14dp"
